@@ -1,18 +1,49 @@
 nParts = 10000;
-M = zeros(1,nParts);
-F = zeros(1,nParts);
-SF = zeros(1,nParts);
-BM = zeros(1,nParts);
-EI = ones(1,nParts);
-Angle = zeros(1,nParts);
-v = zeros(1,nParts);
+M = zeros(nParts,1);
+F = zeros(nParts,1);
+cond_dist = [];
+cond_moment = [];
 
 %Take data
-L = input('Length : ');
-L_ = L/nParts;
+data = importdata('data.dat');
 
-EI = input('EI : ')*ones(1,nParts);
-
+for i=1:size(data)(1)
+  switch data(i,1)
+    case 0
+      L = data(i,2);
+      L_ = L/nParts;
+    case 1
+      d = data(i,2);
+      f = data(i,3);
+      F(int16(d/L_),1) = F(int16(d/L_),1)+f;
+    case 2
+      d = data(i,2);
+      m = data(i,3);
+      M(int16(d/L_),1) = M(int16(d/L_),1)+m;
+    case 3
+      d1 = data(i,2);
+      d2 = data(i,3);
+      f = data(i,4);
+      F(int16(d1/L_):int16(d2/L_),1) = F(int16(d1/L_):int16(d2/L_),1) + L_*f;
+    case 4
+      d1 = data(i,2);
+      d2 = data(i,3);
+      f1 = data(i,4);
+      f2 = data(i,5);
+      F(int16(d1/L_):int16(d2/L_),1) = F(int16(d1/L_):int16(d2/L_),1) + (f1:(f2-f1)/((f2-f1)/L_):f2)*L_;
+    case 5
+      d = data(i,2);
+      f = zeros(nParts);
+      f(int16(d/L_)) = 1;
+      F = [F f];
+    case 6
+      
+    case 7
+      
+    case 8
+      
+  end
+end
 
 n = input('Total conc. loads : ');
 for i=1:n
@@ -42,6 +73,18 @@ for i=1:n
   %disp((l1:(l2-l1)/((d2-d1)/L_):l2));
   F(int16(d1/L_):int16(d2/L_)) = F(int16(d1/L_):int16(d2/L_)) + (l1:(l2-l1)/((d2-d1)/L_):l2)*L_;
 end
+
+n=input('Total number of reactions : ');
+for i=1:n
+  d=input('dist : ');
+  F=[F zeros(nParts,1)];
+  F(i+1,int16(d/L_))=-1;
+end
+
+BM = zeros(nParts,BM_vars+1);
+EI = ones(nParts,SF_vars+1);
+Angle = zeros(nParts,Angle_vars+1);
+v = zeros(nParts,v_vars+1);
 
 t = cputime;
 
